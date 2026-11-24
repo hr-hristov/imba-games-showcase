@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>imba for game studios</title>
+<meta name="description" content="Agents that model characters in Blender, stage scenes, play Unity builds, test them and drive Windows machines.">
+<style>
+@font-face{font-family:'Archivo Variable';font-weight:100 900;font-stretch:62% 125%;font-display:swap;src:url(fonts/archivo-latin-wdth-normal.woff2) format('woff2-variations')}
+@font-face{font-family:'Silkscreen';font-weight:400;font-display:swap;src:url(fonts/silkscreen-latin-400-normal.woff2) format('woff2')}
+:root{
+  --bg:#0b0a10;--bg2:#13111b;--card:#191623;--line:#2a2638;
+  --ink:#f4f1fa;--muted:#b5afc6;--dim:#7f7893;
+  --pink:#ff2d8a;--orange:#ff6a2b;--cyan:#38e1ff;--lime:#a6ff4d;
+  --sans:'Archivo Variable',system-ui,sans-serif;--pixel:'Silkscreen',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+video{display:block;width:100%;height:auto;background:#000}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+
+/* top bar */
+.bar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:22px 32px}
+.logo{font-family:var(--pixel);font-size:26px;letter-spacing:2px;color:var(--ink);text-decoration:none}
+.logo b{color:var(--pink);font-weight:400}
+.nav{display:flex;gap:22px;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.nav a{text-decoration:none;color:var(--muted);white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}
+.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(1.15)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(90deg,rgba(11,10,16,.88) 0%,rgba(11,10,16,.6) 45%,rgba(11,10,16,.1) 80%),
+  linear-gradient(180deg,rgba(11,10,16,.6) 0%,rgba(11,10,16,.2) 30%,rgba(11,10,16,.8) 72%,var(--bg) 100%),
+  radial-gradient(ellipse at 20% 80%,rgba(255,45,138,.28),transparent 55%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.6) 0 1px,transparent 1px 3px)}
+.hero .wrap{padding-bottom:72px;width:100%}
+.eyebrow{font-family:var(--pixel);font-size:15px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:18px}
+h1{font-size:clamp(44px,7.4vw,104px);line-height:.95;font-weight:850;font-stretch:112%;letter-spacing:-.02em;max-width:11.5em}
+h1 .g{background:linear-gradient(90deg,var(--pink),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{text-shadow:0 1px 12px rgba(0,0,0,.6);margin-top:24px;font-size:clamp(18px,2vw,23px);color:var(--muted);max-width:40em}
+.facts{margin-top:40px;display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);background:rgba(19,17,27,.72);backdrop-filter:blur(8px)}
+.facts div{padding:16px 18px;border-left:1px solid var(--line)}
+.facts div:first-child{border-left:0}
+.facts b{display:block;font-family:var(--pixel);font-weight:400;font-size:clamp(20px,2.4vw,30px);color:var(--ink);line-height:1.1}
+.facts span{display:block;margin-top:6px;font-size:13px;color:var(--dim);line-height:1.35}
+
+/* chapters */
+.chapter{padding:130px 0 40px;position:relative}
+.chapter + .chapter{border-top:1px solid var(--line)}
+.num{font-family:var(--pixel);font-size:15px;letter-spacing:3px;display:flex;align-items:center;gap:14px;text-transform:uppercase}
+.num::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,currentColor,transparent);opacity:.5}
+.c1 .num{color:var(--pink)}.c2 .num{color:var(--orange)}.c3 .num{color:var(--lime)}.c4 .num{color:var(--cyan)}.c5 .num{color:#7aa2ff}
+h2{margin-top:22px;font-size:clamp(34px,4.6vw,62px);line-height:1.02;font-weight:820;font-stretch:108%;letter-spacing:-.015em;max-width:15em}
+.intro{margin-top:20px;font-size:20px;color:var(--muted);max-width:42em}
+.why{margin-top:26px;display:inline-flex;gap:12px;align-items:baseline;padding:12px 16px;border-left:3px solid currentColor;background:var(--bg2);max-width:50em;font-size:16px;color:var(--muted)}
+.why b{font-family:var(--pixel);font-weight:400;font-size:12px;letter-spacing:2px;white-space:nowrap;color:var(--ink)}
+
+.frame{border:1px solid var(--line);background:var(--card);overflow:hidden;position:relative}
+.frame video{border-bottom:1px solid var(--line)}
+.cap{padding:14px 16px 16px;font-size:15px;color:var(--muted);line-height:1.45}
+.cap b{color:var(--ink);font-weight:700}
+.tag{position:absolute;top:12px;left:12px;font-family:var(--pixel);font-size:11px;letter-spacing:1.5px;padding:5px 8px;background:rgba(11,10,16,.82);color:var(--ink);border:1px solid var(--line);white-space:nowrap;text-transform:uppercase}
+.wide{margin-top:48px}
+.glow-pink{box-shadow:0 30px 120px -40px rgba(255,45,138,.45)}
+.glow-orange{box-shadow:0 30px 120px -40px rgba(255,106,43,.45)}
+.glow-lime{box-shadow:0 30px 120px -40px rgba(166,255,77,.3)}
+.glow-cyan{box-shadow:0 30px 120px -40px rgba(56,225,255,.35)}
+.glow-blue{box-shadow:0 30px 120px -40px rgba(122,162,255,.4)}
+
+.trio{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.trio video{background:#efedea}
+.duo{margin-top:22px;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.split{margin-top:56px;display:grid;grid-template-columns:1.25fr 1fr;gap:44px;align-items:center}
+.split.rev{grid-template-columns:1fr 1.25fr}
+.split.rev .media{order:2}
+.points{list-style:none;display:grid;gap:18px}
+.points li{padding-left:22px;position:relative;color:var(--muted);font-size:17px}
+.points li::before{content:"";position:absolute;left:0;top:.6em;width:9px;height:9px;background:currentColor}
+.c1 .points li::before{background:var(--pink)}.c2 .points li::before{background:var(--orange)}.c3 .points li::before{background:var(--lime)}.c4 .points li::before{background:var(--cyan)}.c5 .points li::before{background:#7aa2ff}
+.points b{color:var(--ink)}
+h3{font-size:26px;font-weight:780;font-stretch:105%;line-height:1.15;margin-bottom:18px}
+
+.strip{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--bg2)}
+.strip div{padding:20px 22px;border-left:1px solid var(--line)}
+.strip div:first-child{border-left:0}
+.strip b{display:block;font-family:var(--pixel);font-weight:400;font-size:30px;line-height:1.1}
+.strip span{display:block;margin-top:6px;font-size:14px;color:var(--dim)}
+.c2 .strip b{color:var(--orange)}.c3 .strip b{color:var(--lime)}.c4 .strip b{color:var(--cyan)}.c5 .strip b{color:#7aa2ff}
+
+.games{margin-top:48px;display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.phone-row{margin-top:56px;display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:center}
+.phone{border:10px solid #1f1c2a;border-radius:34px;overflow:hidden;box-shadow:0 30px 100px -30px rgba(166,255,77,.35)}
+
+table{width:100%;border-collapse:collapse;font-size:16px}
+th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line)}
+th{font-family:var(--pixel);font-weight:400;font-size:12px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+td{color:var(--muted)}
+td:first-child{color:var(--ink);font-weight:650}
+td.score{font-family:var(--pixel);color:var(--cyan);white-space:nowrap}
+.bench{border:1px solid var(--line);background:var(--bg2);padding:6px 10px 10px}
+.note{margin-top:14px;font-size:14px;color:var(--dim)}
+
+.limits{padding:120px 0 40px;border-top:1px solid var(--line)}
+.limits .num{color:var(--muted)}
+.lgrid{margin-top:40px;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.lgrid div{border:1px solid var(--line);background:var(--bg2);padding:22px 24px;color:var(--muted);font-size:16px}
+.lgrid b{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+
+.cta{margin-top:100px;padding:90px 0 110px;text-align:center;position:relative;overflow:hidden;border-top:1px solid var(--line);
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,45,138,.22),transparent 60%),var(--bg)}
+.cta h2{margin:18px auto 0}
+.cta .intro{margin:20px auto 0}
+.where{margin:46px auto 0;max-width:980px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);text-align:left;background:var(--bg2)}
+.where div{padding:22px 20px;border-left:1px solid var(--line)}
+.where div:first-child{border-left:0}
+.where i{display:block;font-style:normal;font-family:var(--pixel);font-size:11px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+.where b{display:block;margin-top:8px;font-size:17px;line-height:1.3}
+.where span{display:block;margin-top:6px;font-size:14px;color:var(--muted)}
+footer{padding:30px 0 50px;text-align:center;font-size:13px;color:var(--dim)}
+
+@media (max-width:900px){
+  body{font-size:17px}
+  .nav{display:none}
+  .bar{padding:18px 20px}
+  .wrap{padding:0 20px}
+  .hero{min-height:0;display:block;padding-top:68px}
+  .hero video{position:relative;inset:auto;height:auto;aspect-ratio:16/9;z-index:0}
+  .hero::before{display:none}
+  .hero::after{bottom:auto;top:68px;aspect-ratio:16/9;height:auto;width:100%}
+  .hero .wrap{padding-top:28px;padding-bottom:20px}
+  .bar{background:var(--bg)}
+  .facts{grid-template-columns:repeat(2,1fr)}
+  .facts div{border-left:0;border-top:1px solid var(--line)}
+  .facts div:nth-child(-n+2){border-top:0}
+  .facts div:nth-child(even){border-left:1px solid var(--line)}
+  .facts div:last-child{grid-column:1/-1;border-left:0}
+  .chapter{padding:90px 0 20px}
+  .trio{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .trio .cap{padding:8px 8px 10px;font-size:12px}
+  .duo,.games,.split,.split.rev,.lgrid{grid-template-columns:1fr}
+  .split.rev .media{order:0}
+  .split{gap:28px}
+  .strip{grid-template-columns:1fr}
+  .strip div{border-left:0;border-top:1px solid var(--line)}
+  .strip div:first-child{border-top:0}
+  .phone-row{grid-template-columns:1fr;gap:32px}
+  .phone{max-width:280px;margin:0 auto}
+  .where{grid-template-columns:1fr 1fr}
+  .where div:nth-child(3){border-left:0}
+  .where div:nth-child(n+3){border-top:1px solid var(--line)}
+  th,td{padding:10px 8px;font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="logo" href="#top">imba<b>.</b>games</a>
+  <nav class="nav">
+    <a href="#assets">Assets</a><a href="#scenes">Scenes</a><a href="#play">Play</a><a href="#test">Test</a><a href="#windows">Windows</a>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <video src="films/reel.mp4" poster="posters/reel.jpg" autoplay muted loop playsinline></video>
+  <div class="wrap">
+    <p class="eyebrow">imba for game studios</p>
+    <h1>Agents that build your world, <span class="g">then play it.</span></h1>
+    <p class="lede">imba runs AI agents that model characters in Blender, stage whole scenes, play Unity builds from the screen alone, write the bug report, and drive the Windows machine your game ships on. Every film on this page comes from a real run or a real render.</p>
+    <div class="facts">
+      <div><b>7</b><span>characters modelled in Blender</span></div>
+      <div><b>1,987</b><span>parts in one staged scene</span></div>
+      <div><b>4</b><span>Unity games played by a bot</span></div>
+      <div><b>&lt;1 s</b><span>a move, on one RTX 2080 Ti</span></div>
+      <div><b>Win 11</b><span>driven live from the browser</span></div>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- 01 assets -->
+<section class="chapter c1" id="assets">
+  <div class="wrap">
+    <p class="num">01 / 3D asset building</p>
+    <h2>Characters built in Blender, reviewed in the browser.</h2>
+    <p class="intro">An agent writes the Blender scripts, models the character, textures it and renders a turntable for review. Kuker, Samodiva and the bug below came out of that loop, each kept as its own version so nothing approved is ever overwritten.</p>
+    <p class="why" style="color:var(--pink)"><b>FOR STUDIOS</b>Concept to reviewable model without blocking an artist, with every iteration kept on disk.</p>
+
+    <div class="trio">
+      <figure class="frame glow-pink"><video src="films/asset-kuker.mp4" poster="posters/asset-kuker.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Kuker</b>, a folklore masked dancer</figcaption></figure>
+      <figure class="frame glow-pink"><video src="films/asset-samodiva.mp4" poster="posters/asset-samodiva.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Samodiva</b>, a forest spirit</figcaption></figure>
+      <figure class="frame glow-pink"><video src="films/asset-bug.mp4" poster="posters/asset-bug.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>The bug</b>, the story's villain</figcaption></figure>
+    </div>
+
+    <div class="split">
+      <figure class="frame media glow-pink"><span class="tag">Real recording</span><video src="films/asset-notes.mp4" poster="posters/asset-notes.jpg" autoplay muted loop playsinline></video></figure>
+      <div>
+        <h3>Point at a part. The agent knows exactly which one.</h3>
+        <ul class="points">
+          <li>Pin a <b>.blend, .glb or .gltf</b> and it opens as a 3D view you turn, zoom and pan, with Maya and Blender style Alt controls.</li>
+          <li>A tap pins a note to the part under it. The note carries the <b>part and material as Blender names them</b>, the point in Blender axes and the camera.</li>
+          <li>Box, Circle and Free outline mark an area, and the note lists every part inside it.</li>
+          <li>All notes go back to the agent in one message, each with a picture of the spot from two angles.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 scenes -->
+<section class="chapter c2" id="scenes">
+  <div class="wrap">
+    <p class="num">02 / 3D scene building</p>
+    <h2>Whole scenes, staged, lit and cut to camera.</h2>
+    <p class="intro">The same agents stage full scenes: crowds of characters, camera moves and a story cut. This is the opening film of imba itself, built shot by shot in Blender and approved as cut.</p>
+    <p class="why" style="color:var(--orange)"><b>FOR STUDIOS</b>Cinematics, trailers and level previews iterated by agents while the team reviews frames.</p>
+
+    <figure class="frame wide glow-orange"><span class="tag">Approved cut / 28 s</span><video src="films/scene-opening.mp4" poster="posters/scene-opening.jpg" autoplay muted loop playsinline></video></figure>
+
+    <div class="strip">
+      <div><b>1,987</b><span>parts in the hero story scene</span></div>
+      <div><b>5</b><span>film cameras, each one selectable</span></div>
+      <div><b>796</b><span>frames, played back in the browser</span></div>
+    </div>
+
+    <div class="duo">
+      <figure class="frame glow-orange"><video src="films/scene-review.mp4" poster="posters/scene-review.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Review the scene, not a render.</b> The scene opens through its own camera, the Shot menu steps through the others, and the frame strip plays the animation.</figcaption></figure>
+      <figure class="frame glow-orange"><video src="films/scene-walk.mp4" poster="posters/scene-walk.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Walk through it.</b> W, A, S and D walk the camera along the ground, the way Blender's walk mode does, and notes land wherever you stop.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 03 play -->
+<section class="chapter c3" id="play">
+  <div class="wrap">
+    <p class="num">03 / Playing Unity games</p>
+    <h2>A bot that plays your build from the screen alone.</h2>
+    <p class="intro">No SDK, no hooks in your code. The agent sets a goal, and a free vision model looks at a picture of the game and holds the keys, 0.4 to 0.7 seconds a move. The panel on the right of each film shows the goal, the agent's last verdict and every move.</p>
+    <p class="why" style="color:var(--lime)"><b>FOR STUDIOS</b>A Unity WebGL build is playable as soon as it is served, with nothing added to the game.</p>
+
+    <div class="games">
+      <figure class="frame glow-lime"><span class="tag">Top-down action</span><video src="films/play-topdown.mp4" poster="posters/play-topdown.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Top Down Combat.</b> Walks to the flowers, around the pond and to the sword.</figcaption></figure>
+      <figure class="frame glow-lime"><span class="tag">Third-person 3D</span><video src="films/play-gnome.mp4" poster="posters/play-gnome.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Gnome.</b> Reached 5 of 6 goals across the hill.</figcaption></figure>
+      <figure class="frame glow-lime"><span class="tag">First-person shooter</span><video src="films/play-fps.mp4" poster="posters/play-fps.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>IPFS FPS.</b> Turns with the mouse, strafes, jumps and fires.</figcaption></figure>
+      <figure class="frame glow-lime"><span class="tag">Top-down tanks</span><video src="films/play-core.mp4" poster="posters/play-core.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Core Assault.</b> Drives the tank through the brick maze.</figcaption></figure>
+    </div>
+
+    <div class="phone-row">
+      <div class="phone"><video src="films/play-phone.mp4" poster="posters/play-phone.jpg" autoplay muted loop playsinline></video></div>
+      <div>
+        <h3>Your team plays it too, on a phone.</h3>
+        <ul class="points">
+          <li>Any game in imba's web view gets <b>touch controls</b>: a stick for W, A, S and D, and Fire, Jump and Use buttons.</li>
+          <li>The Keys sheet maps each control to the key your game expects, and a drag turns the view.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 test -->
+<section class="chapter c4" id="test">
+  <div class="wrap">
+    <p class="num">04 / Automated game testing</p>
+    <h2>Two layers: one that plans the test, one that presses the keys.</h2>
+    <p class="intro">The agent writes the checklist a QA tester would: edges, walls, water, pickups, weapons, doors. It sets one goal at a time, the fast model plays it, and the agent reads the closing shot and judges. Faults land on a test report as findings.</p>
+    <p class="why" style="color:var(--cyan)"><b>FOR STUDIOS</b>Collision, boundary and pickup checks on every build, with a film of each run as the evidence.</p>
+
+    <figure class="frame wide glow-cyan"><span class="tag">Test run / walls, edges, sword</span><video src="films/test-run.mp4" poster="posters/test-run.jpg" autoplay muted loop playsinline></video></figure>
+
+    <div class="strip">
+      <div><b>1st run</b><span>found the hero walking half into the top cliff</span></div>
+      <div><b>8 / 10</b><span>goals reached on the Top Down Combat bench</span></div>
+      <div><b>$0</b><span>for the fast layer, a free model on your own card</span></div>
+    </div>
+
+    <div class="split rev">
+      <figure class="frame media glow-cyan"><video src="films/test-mark.mp4" poster="posters/test-mark.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Mark the fault yourself.</b> Feedback mode splits the game canvas into nine spots, so a note points at the part of the screen it is about.</figcaption></figure>
+      <div class="bench">
+        <table>
+          <thead><tr><th>Game</th><th>Kind</th><th>Goals</th></tr></thead>
+          <tbody>
+            <tr><td>Top Down Combat</td><td>top-down action</td><td class="score">8 / 10</td></tr>
+            <tr><td>Gnome</td><td>third-person 3D</td><td class="score">5 / 6</td></tr>
+            <tr><td>IPFS FPS</td><td>first-person shooter</td><td class="score">3 / 6</td></tr>
+            <tr><td>Core Assault</td><td>top-down tanks</td><td class="score">3 / 8</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Qwen3-VL 4B on one RTX 2080 Ti, each goal from a fresh load, judged by the agent from the closing shot. Top Down Combat shows the best of seven runs, whose usual score is 7.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 windows -->
+<section class="chapter c5" id="windows">
+  <div class="wrap">
+    <p class="num">05 / Windows machines</p>
+    <h2>The Windows build, live in the same window as the agent.</h2>
+    <p class="intro">Add any Windows machine on your network by its address, or run Windows 11 in a container on the build server. Its screen streams into imba's web view, your clicks and typing reach it, and notes drawn on it go to the agent.</p>
+    <p class="why" style="color:#7aa2ff"><b>FOR STUDIOS</b>Check the Windows build, launcher or editor tool from any browser, without a desk next to the test PC.</p>
+
+    <figure class="frame wide glow-blue"><span class="tag">Real recording / Windows 11</span><video src="films/win-notes.mp4" poster="posters/win-notes.jpg" autoplay muted loop playsinline></video></figure>
+
+    <div class="split">
+      <div>
+        <h3>A fleet of test PCs, listed in Settings.</h3>
+        <ul class="points">
+          <li><b>Settings › System › Desktops</b> lists each machine with its address and whether it answers right now.</li>
+          <li>Clicks, right clicks, drags, the scroll wheel and typed text all reach Windows, accented letters included, with Start, Esc and Task view on the key bar.</li>
+          <li>A machine marked <b>view only</b> is watched and never sent a key.</li>
+          <li>The demo machine boots Windows 11 from its kept disk in under a minute, and installs its app on the first start.</li>
+        </ul>
+      </div>
+      <figure class="frame media glow-blue"><video src="films/win-live.mp4" poster="posters/win-live.jpg" autoplay muted loop playsinline></video><figcaption class="cap"><b>Live view.</b> The machine's screen at its own wide shape, so a click lands where it is pointed.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- limits -->
+<section class="limits">
+  <div class="wrap">
+    <p class="num">Where it stands today</p>
+    <h2>The numbers above, with their edges.</h2>
+    <div class="lgrid">
+      <div><b>Fast shooters are still hard.</b>The bot reaches half its goals in the first-person shooter, and in one run it walked into the open and was killed before finding the pickup.</div>
+      <div><b>The bot plays browser builds.</b>Unity WebGL games play today. A Windows game is reviewed by people over the live view, not played by the bot.</div>
+      <div><b>A large scene takes time to convert.</b>The 796-frame hero story took 13 minutes to prepare for playback, once. A single frame takes about 90 seconds.</div>
+      <div><b>Remote screens are not encrypted.</b>A machine outside a trusted network is reached through a VPN or an SSH tunnel to its screen-sharing port.</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <p class="eyebrow">Start with what you have</p>
+    <h2>Your models, your build, your test PC.</h2>
+    <p class="intro">Each of these runs inside an imba spawn, the agent's workspace, next to the chat where you give it the job.</p>
+    <div class="where">
+      <div><i>Assets</i><b>Pin a .blend or .glb</b><span>It opens as a 3D view with notes.</span></div>
+      <div><i>Play</i><b>Open the game's address</b><span>It plays in the web view, with touch controls.</span></div>
+      <div><i>Test</i><b>Ask for a manual test</b><span>The agent writes the checklist and films each run.</span></div>
+      <div><i>Windows</i><b>Add a machine in Desktops</b><span>Its screen joins the device list.</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>imba. Sample games used for testing belong to their authors. Characters and the opening film are imba's own.</footer>
+</body>
+</html>
